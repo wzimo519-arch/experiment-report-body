@@ -10,3 +10,5 @@
 - 增加 PowerShell 通用安装命令。
 - 完成全局技能登记，来源记录为 GitHub 仓库 `wzimo519-arch/experiment-report-body`。
 - 执行 `skills update experiment-report-body -g`，确认全局技能与上游一致。
+- 增加 WorkBuddy 实际技能路径与 CLI `codebuddy` 目标目录不一致的说明。
+- 将 WorkBuddy 技能目录改为指向 canonical 副本的目录联接，后续更新可自动同步。

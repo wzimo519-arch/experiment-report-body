@@ -89,3 +89,7 @@ $dst = '<目标 Agent 技能目录>\experiment-report-body'; New-Item -ItemType 
 ## 后续更新
 
 经过验证、且会改变未来决策的经验，应追加到 `references/lessons.md`。完成更新后应运行目标 Agent 的 skill 校验工具；若没有官方校验器，至少检查 frontmatter、文件引用和必需输入是否完整。
+
+## 版本记录
+
+查看 [CHANGELOG.md](CHANGELOG.md)。

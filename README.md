@@ -15,6 +15,12 @@
 3. 放入 `SKILL.md` 和 `references/lessons.md`。
 4. 重新加载或重启 Agent，使技能列表更新。
 
+通用安装命令（PowerShell；请把 `<目标 Agent 技能目录>` 替换为 Agent 设置中显示的实际目录）：
+
+```powershell
+$dst = '<目标 Agent 技能目录>\experiment-report-body'; New-Item -ItemType Directory -Force $dst | Out-Null; Copy-Item '.\SKILL.md' $dst -Force; Copy-Item '.\references' $dst -Recurse -Force
+```
+
 不同产品的技能根目录不同，应以 Agent 当前设置页或官方文档为准。
 
 ### 单文件自定义指令

@@ -69,13 +69,13 @@ $dst = '<目标 Agent 技能目录>\experiment-report-body'; New-Item -ItemType 
 ## 常见 Agent
 
 - DSH：使用软件中的技能、工具或自定义指令导入功能；支持目录时使用其设置中显示的技能目录。
-- Workbuddy：实际读取 `~/.workbuddy/skills/`；CLI 的 `codebuddy` 目标通常写入 `~/.codebuddy/skills/`，两者不是同一路径。
+- WorkBuddy：实际读取 `~/.workbuddy/skills/`；CLI 的 `codebuddy` 目标通常写入 `~/.codebuddy/skills/`，两者不是同一路径。
 - TARE：使用其自定义指令或知识文件功能；按当前版本支持的方式导入。
 - 其他 Agent：优先使用目录型 Skill；不支持时改用单文件自定义指令。
 
-除已验证的 WorkBuddy 路径外，本项目不写死其他产品的安装路径，因为安装位置会随产品版本、安装方式和用户配置变化。
+除已验证的 CodeBuddy 与 WorkBuddy 路径外，本项目不写死其他产品的安装路径，因为安装位置会随产品版本、安装方式和用户配置变化。
 
-### WorkBuddy 自动同步
+### CodeBuddy 与 WorkBuddy 自动同步
 
 CLI 的 `codebuddy` 目标和 WorkBuddy 实际读取的目录不是同一个路径。推荐把两者都链接到 CLI 的 canonical 副本，而不是保留独立复制：
 

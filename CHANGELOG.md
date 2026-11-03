@@ -6,7 +6,7 @@
 - 将技能说明和已验证经验统一为中文。
 - 将必需输入明确为原始报告、代码写入目录和代码编辑器。
 - 增加目录型 Skill 与单文件自定义指令两种通用导入方式。
-- 增加适用于 DSH、Workbuddy、TARE 等 Agent 的通用安装说明。
+- 增加适用于 DSH、WorkBuddy、TARE 等 Agent 的通用安装说明。
 - 增加 PowerShell 通用安装命令。
 - 完成全局技能登记，来源记录为 GitHub 仓库 `wzimo519-arch/experiment-report-body`。
 - 执行 `skills update experiment-report-body -g`，确认全局技能与上游一致。

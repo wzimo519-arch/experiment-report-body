@@ -21,6 +21,23 @@ https://github.com/wzimo519-arch/experiment-report-body
 
 这条自然语言请求只有在 Agent 具备 GitHub 访问能力和全局技能目录时才能自动完成。否则请使用下面的通用安装方式。
 
+如果 npm 官方源不可达，可先切换到国内镜像：
+
+```powershell
+$env:npm_config_registry='https://registry.npmmirror.com'
+npx --yes skills add wzimo519-arch/experiment-report-body
+```
+
+如果 `npx` 报 `ENOTCACHED`，但本机以前运行过 `skills`，可以直接调用 npm 缓存中最新的 CLI。`npx --offline skills` 按包名查找时不会复用带随机哈希的 `_npx` 缓存，因此会误报缓存不存在：
+
+```powershell
+$skillsCli = Get-ChildItem "$env:LOCALAPPDATA\npm-cache\_npx" -Recurse -Filter skills.cmd -ErrorAction SilentlyContinue |
+  Sort-Object LastWriteTime -Descending |
+  Select-Object -First 1
+if (-not $skillsCli) { throw '未找到缓存的 skills CLI，请联网安装或手动导入。' }
+& $skillsCli.FullName add wzimo519-arch/experiment-report-body
+```
+
 ## 安装方式
 
 ### 目录型 Skill
@@ -60,17 +77,28 @@ $dst = '<目标 Agent 技能目录>\experiment-report-body'; New-Item -ItemType 
 
 ### WorkBuddy 自动同步
 
-推荐让 WorkBuddy 目录指向 CLI 的 canonical 副本，而不是保留一份独立复制：
+CLI 的 `codebuddy` 目标和 WorkBuddy 实际读取的目录不是同一个路径。推荐把两者都链接到 CLI 的 canonical 副本，而不是保留独立复制：
 
 ```powershell
 $canonical = Join-Path $HOME '.agents\skills\experiment-report-body'
-$workbuddy = Join-Path $HOME '.workbuddy\skills\experiment-report-body'
-New-Item -ItemType Directory -Force (Split-Path -Parent $workbuddy) | Out-Null
-if (Test-Path $workbuddy) { throw 'WorkBuddy 路径已存在；请先备份或移动旧副本。' }
-New-Item -ItemType Junction -Path $workbuddy -Target $canonical
+$links = @(
+  (Join-Path $HOME '.codebuddy\skills\experiment-report-body'),
+  (Join-Path $HOME '.workbuddy\skills\experiment-report-body')
+)
+foreach ($link in $links) {
+  New-Item -ItemType Directory -Force (Split-Path -Parent $link) | Out-Null
+  if (Test-Path $link) {
+    $item = Get-Item $link -Force
+    if ($item.LinkType -ne 'Junction' -or @($item.Target)[0] -ne $canonical) {
+      throw "路径已存在且不是目标 Junction：$link；请先备份或移动旧副本。"
+    }
+    continue
+  }
+  New-Item -ItemType Junction -Path $link -Target $canonical
+}
 ```
 
-完成后，更新 CLI 的 canonical 副本即可自动同步 WorkBuddy：
+完成后，更新 CLI 的 canonical 副本即可自动同步 CodeBuddy 与 WorkBuddy：
 
 ```powershell
 $env:npm_config_registry='https://registry.npmmirror.com'

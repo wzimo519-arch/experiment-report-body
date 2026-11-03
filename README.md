@@ -4,6 +4,23 @@
 
 本仓库不依赖特定 Agent 产品。只要目标 Agent 能加载 Markdown 指令，就可以使用。
 
+## 一键安装
+
+如果目标 Agent 支持 GitHub Skill 安装命令，可直接执行：
+
+```text
+npx skills add wzimo519-arch/experiment-report-body
+```
+
+也可以直接对该 Agent 说：
+
+```text
+请从 GitHub 安装 experiment-report-body 这个 skill：
+https://github.com/wzimo519-arch/experiment-report-body
+```
+
+这条自然语言请求只有在 Agent 具备 GitHub 访问能力和全局技能目录时才能自动完成。否则请使用下面的通用安装方式。
+
 ## 安装方式
 
 ### 目录型 Skill

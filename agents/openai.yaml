@@ -1,0 +1,7 @@
+interface:
+  display_name: "school_easier"
+  short_description: "自动完成指定网页题目并填写实验报告正文"
+  default_prompt: "使用 $school-easier 完成我指定的网页题目或实验报告正文，并核验结果。"
+
+policy:
+  allow_implicit_invocation: true

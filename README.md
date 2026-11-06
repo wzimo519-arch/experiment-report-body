@@ -1,8 +1,27 @@
-# 实验报告正文通用 Skill
+# school_easier
 
-用于完成已有大学理工科课程实验 Word 实验报告中的实验正文，包括实验步骤、实验结果、截图和实验分析。
+根据用户输入自动选择 `web_task` 或 `course_experiment` 分支。两种模式共用一个 skill 入口，也可以按“先完成网页题目，再填写实验报告”的顺序串联执行。
 
 本仓库不依赖特定 Agent 产品。只要目标 Agent 能加载 Markdown 指令，就可以使用。
+
+## 运行原理
+
+`SKILL.md` 是轻量入口，只负责判断场景并选择一个分支。具体流程按需加载：
+
+- 网页任务读取 `branches/web_task.md`。
+- 实验报告读取 `branches/course_experiment.md`。
+- 两者串联时先完成网页任务，再把真实结果交给报告流程。
+
+分支内部执行 `Plan -> Do -> Check -> Act -> Close` 循环。每次操作后重新读取页面或文档状态，以单题结果、成绩单、总进度、真实运行输出或逐页渲染作为完成证据。
+
+详细设计见 [references/architecture.md](references/architecture.md)。
+
+## 两种工作模式
+
+- **`web_task`**：用户提供页面链接和明确题目清单时，操作已登录网页完成选择题、普通代码题、填空代码题、异步评阅和进度核验。
+- **`course_experiment`**：用户提供 Word 实验报告、代码目录和编辑器时，只补齐指定正文、真实运行结果和截图。
+
+技能入口根据是否存在页面链接、题目清单、Word 报告和正文范围自动分流；两者同时出现时，先完成网页任务，再用真实输出填写报告。
 
 ## 一键安装
 
@@ -15,7 +34,7 @@ npx skills add wzimo519-arch/experiment-report-body
 也可以直接对该 Agent 说：
 
 ```text
-请从 GitHub 安装 experiment-report-body 这个 skill：
+请从 GitHub 安装 school-easier 这个 skill：
 https://github.com/wzimo519-arch/experiment-report-body
 ```
 
@@ -45,14 +64,14 @@ if (-not $skillsCli) { throw '未找到缓存的 skills CLI，请联网安装或
 如果 Agent 支持 `SKILL.md` 目录结构：
 
 1. 打开该 Agent 的“技能”“插件”或“自定义指令”设置。
-2. 在它指定的技能根目录中创建 `experiment-report-body` 文件夹。
-3. 放入 `SKILL.md` 和 `references/lessons.md`。
+2. 在它指定的技能根目录中创建 `school-easier` 文件夹。
+3. 放入 `SKILL.md`、`branches/`、`references/` 和 `agents/`。
 4. 重新加载或重启 Agent，使技能列表更新。
 
 通用安装命令（PowerShell；请把 `<目标 Agent 技能目录>` 替换为 Agent 设置中显示的实际目录）：
 
 ```powershell
-$dst = '<目标 Agent 技能目录>\experiment-report-body'; New-Item -ItemType Directory -Force $dst | Out-Null; Copy-Item '.\SKILL.md' $dst -Force; Copy-Item '.\references' $dst -Recurse -Force
+$dst = '<目标 Agent 技能目录>\school-easier'; New-Item -ItemType Directory -Force $dst | Out-Null; Copy-Item '.\*' $dst -Recurse -Force
 ```
 
 不同产品的技能根目录不同，应以 Agent 当前设置页或官方文档为准。
@@ -61,7 +80,7 @@ $dst = '<目标 Agent 技能目录>\experiment-report-body'; New-Item -ItemType 
 
 如果 Agent 只能导入一份自定义指令：
 
-1. 新建名为“实验报告正文”的技能或助手。
+1. 新建名为 `school-easier` 的技能或助手。
 2. 导入 `SKILL.md` 的内容。
 3. 若支持附加知识文件，一并导入 `references/lessons.md`。
 4. 若不支持附加文件，只把与当前任务相关的经验补充到使用说明中。
@@ -80,10 +99,10 @@ $dst = '<目标 Agent 技能目录>\experiment-report-body'; New-Item -ItemType 
 CLI 的 `codebuddy` 目标和 WorkBuddy 实际读取的目录不是同一个路径。推荐把两者都链接到 CLI 的 canonical 副本，而不是保留独立复制：
 
 ```powershell
-$canonical = Join-Path $HOME '.agents\skills\experiment-report-body'
+$canonical = Join-Path $HOME '.agents\skills\school-easier'
 $links = @(
-  (Join-Path $HOME '.codebuddy\skills\experiment-report-body'),
-  (Join-Path $HOME '.workbuddy\skills\experiment-report-body')
+  (Join-Path $HOME '.codebuddy\skills\school-easier'),
+  (Join-Path $HOME '.workbuddy\skills\school-easier')
 )
 foreach ($link in $links) {
   New-Item -ItemType Directory -Force (Split-Path -Parent $link) | Out-Null
@@ -102,20 +121,27 @@ foreach ($link in $links) {
 
 ```powershell
 $env:npm_config_registry='https://registry.npmmirror.com'
-npx --yes skills update experiment-report-body -g -y
+npx --yes skills update school-easier -g -y
 ```
 
 ## 调用
 
-在支持技能选择的 Agent 中显式选择或引用 `experiment-report-body`。
+在支持技能选择的 Agent 中显式选择或引用 `school-easier`。
 
 在只支持对话的 Agent 中，可以先发送：
 
 ```text
-请使用 experiment-report-body 规则完成接下来的实验正文任务。
+请使用 school-easier 完成接下来的课程任务。
 ```
 
-## 使用前必须提供
+网页任务示例：
+
+```text
+请使用 school-easier 完成这个页面中从 2-1 到 8-1-2 的指定题目：
+https://www.educoder.net/classrooms/573HQJSD/shixun_homework
+```
+
+## course_experiment 使用前必须提供
 
 1. 原始 Word 实验报告文件。
 2. 代码写入目录。
@@ -123,7 +149,7 @@ npx --yes skills update experiment-report-body -g -y
 
 缺少任一项时，应停止并询问，不应自行猜测。
 
-## 修改边界
+## course_experiment 修改边界
 
 只处理用户指定的实验正文，以及正文上方“实验报告文件信息”区域中用于放置截图的空白处。封面、个人信息、预习内容、成绩栏、签名、批注和其他实验章节由使用者本人填写。
 
@@ -133,7 +159,9 @@ npx --yes skills update experiment-report-body -g -y
 
 ## 能力要求
 
-完整闭环需要 Agent 能读取和修改 Word 文档、运行代码并检查渲染结果。若 Agent 不具备 Word 自动化或页面渲染能力，应明确说明限制，不能假装完成版式验收。
+网页模式需要浏览器自动化能力；Word 模式需要读取和修改文档、运行代码并检查渲染结果。若当前 Agent 缺少对应能力，应明确说明限制，不能假装完成提交或版式验收。
+
+网页模式还需要识别异步状态和编辑器类型。遇到多个代码编辑器、填空弹层或判分后答案视图时，应先读取当前可见页面再操作，不能依赖固定坐标或页面绝对序号。
 
 ## 后续更新
 
